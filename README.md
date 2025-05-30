@@ -1,6 +1,6 @@
 # 🚨 Raksha – A Real-Time Women Safety Application.
 
-Raksha is a real-time women safety system developed as part of HackVortex 2025 – Open Innovation Round. It is a multi-module solution built to tackle increasing safety concerns by leveraging AI-powered surveillance, real-time alerts, and mobile-enabled responses.
+Raksha is a real-time women safety system. It is a multi-module solution built to tackle increasing safety concerns by leveraging AI-powered surveillance, real-time alerts, and mobile-enabled responses.
 
 ---
 
