@@ -39,10 +39,10 @@ Raksha is a **three-part application ecosystem** designed to enhance women’s s
 ## ⚙ Tech Stack
 
 - **Frontend:** Flutter, ReactJS
-- **Backend:** Node.js, Firebase, REST APIs
+- **Backend:** Node.js, Web-Sockets, REST APIs
 - **AI Models:** YOLOv8, ResNet50, Haar Cascades
-- **Database:** Firestore, MongoDB
-- **Tools & APIs:** OpenCV, EasyOCR, Google Maps API, Firebase Cloud Messaging
+- **Database:** MongoDB
+- **Tools & APIs:** OpenCV, EasyOCR, Open Layer API 
 
 ---
 
