@@ -1,0 +1,64 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE or Editor-specific files
+.vscode/
+.idea/
+*.swp
+
+# Debug files
+*.pid
+*.seed
+
+# Build files and caches
+dist/
+build/
+.cache/
+
+# Temporary files
+*.tmp
+*.temp
+
+# MongoDB data dumps or backups
+*.dump
+*.bak
+
+# Authentication token files (if any)
+*.token
+
+# Coverage reports
+coverage/
+
+# Flutter/Frontend-related files (if applicable)
+.flutter/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+
+# Uploaded files
+public/uploads/
+public/images/
+
+# Generated files
+*.generated.*
+
+# Ignoring other unwanted files
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+*.tgz

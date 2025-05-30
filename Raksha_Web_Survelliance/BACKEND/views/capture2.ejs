@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Capture with Switch</title>
+</head>
+<body>
+  <h1>Camera Capture</h1>
+  <label for="camera-select">Select Camera:</label>
+  <select id="camera-select"></select>
+  <video id="preview" autoplay></video>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io('http://localhost:3000'); // Socket server connection
+    const preview = document.getElementById('preview');
+    const cameraSelect = document.getElementById('camera-select');
+    let mediaRecorder;
+    let currentStream;
+
+    // Function to stop the current stream
+    const stopStream = () => {
+      if (currentStream) {
+        currentStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+
+    // Function to start the camera with a given deviceId
+    const startCamera = (deviceId) => {
+      stopStream();
+
+      const constraints = {
+        video: { deviceId: deviceId ? { exact: deviceId } : undefined },
+        audio: false,
+      };
+
+      navigator.mediaDevices.getUserMedia(constraints)
+        .then((stream) => {
+          currentStream = stream;
+          preview.srcObject = stream;
+
+          if (mediaRecorder) {
+            mediaRecorder.stop();
+          }
+
+          mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs="vp9"' });
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+              socket.emit('video-stream', { cameraId: "camera2", data: event.data });
+            }
+          };
+
+          mediaRecorder.start(1000); // Capture in chunks of 100ms
+        })
+        .catch((err) => console.error('Error accessing media devices:', err));
+    };
+
+    // Populate the camera select dropdown
+    const populateCameraList = () => {
+      navigator.mediaDevices.enumerateDevices()
+        .then((devices) => {
+          const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+          cameraSelect.innerHTML = ''; // Clear the select dropdown
+          videoDevices.forEach((device, index) => {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.textContent = device.label || `Camera ${index + 1}`;
+            cameraSelect.appendChild(option);
+          });
+          if (videoDevices.length > 0) {
+            startCamera(videoDevices[0].deviceId); // Start with the first camera
+          }
+        })
+        .catch((err) => console.error('Error enumerating devices:', err));
+    };
+
+    // Handle camera selection change
+    cameraSelect.addEventListener('change', (event) => {
+      startCamera(event.target.value);
+    });
+
+    // Initialize the camera list and start the first camera
+    populateCameraList();
+  </script>
+</body>
+</html>

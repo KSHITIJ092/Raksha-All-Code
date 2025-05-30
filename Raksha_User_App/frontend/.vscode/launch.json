@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "women_safety_app1",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart" // Main entry point of the app
+        },
+        {
+            "name": "women_safety_app1 (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "program": "lib/main.dart" // Main entry point of the app
+        },
+        {
+            "name": "women_safety_app1 (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "lib/main.dart" // Main entry point of the app
+        }
+    ]
+}

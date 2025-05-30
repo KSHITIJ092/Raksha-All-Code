@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiple Cameras Display</title>
+</head>
+<body>
+  <h1>Live Video Streams</h1>
+  <div id="streams"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+const socket = io('http://localhost:3000'); // Socket server connection
+const streamsContainer = document.getElementById('streams');
+
+const cameras = ['camera1', 'camera2'];
+const mediaSources = {};
+const sourceBuffers = {};
+const queues = {};
+
+cameras.forEach((cameraId) => {
+  // Create video element for each camera
+  const video = document.createElement('video');
+  video.id = `stream-${cameraId}`;
+  video.autoplay = true;
+  video.controls = true;
+  streamsContainer.appendChild(video);
+
+  // Create a new MediaSource for each camera
+  const mediaSource = new MediaSource();
+  mediaSources[cameraId] = mediaSource;
+  queues[cameraId] = [];
+
+  // Set video source to MediaSource URL
+  video.src = URL.createObjectURL(mediaSource);
+
+  // Initialize the MediaSource and handle the 'sourceopen' event
+  mediaSource.addEventListener('sourceopen', () => {
+    const mimeType = 'video/webm; codecs="vp9"'; // Use vp9 codec
+
+        console.log(`MediaSource opened for ${cameraId}`);
+
+    if (MediaSource.isTypeSupported(mimeType)) {
+      // Create the SourceBuffer for the camera stream
+      sourceBuffers[cameraId] = mediaSource.addSourceBuffer(mimeType);
+      
+      // Handle the 'updateend' event for appending video data
+      sourceBuffers[cameraId].addEventListener('updateend', () => {
+        console.log(`updateend for ${cameraId}`);
+        if (queues[cameraId].length > 0 && !sourceBuffers[cameraId].updating) {
+          const nextChunk = queues[cameraId].shift();
+          console.log(`Appending next chunk for ${cameraId}`);
+          sourceBuffers[cameraId].appendBuffer(nextChunk);
+        }
+      });
+
+      // Check if SourceBuffer was created
+      if (!sourceBuffers[cameraId]) {
+        console.error(`Failed to create SourceBuffer for ${cameraId}`);
+      }
+    } else {
+      console.error(`MIME type ${mimeType} is not supported.`);
+    }
+  });
+
+  // Listen for video stream data from the server
+  socket.on(`display-stream-${cameraId}`, (data) => {
+    console.log(`Received data for ${cameraId}`, data);
+    if (data instanceof ArrayBuffer) {
+      if (
+        mediaSource.readyState === 'open' &&
+        sourceBuffers[cameraId] &&
+        !sourceBuffers[cameraId].updating
+      ) {
+        console.log(`Appending data to SourceBuffer for ${cameraId}`);
+        sourceBuffers[cameraId].appendBuffer(data);
+      } else {
+        console.log(`Queueing data for ${cameraId}`);
+        queues[cameraId].push(data);
+      }
+    } else {
+      console.error(`Invalid data for ${cameraId}`);
+    }
+  });
+});
+    
+  </script>
+</body>
+</html>

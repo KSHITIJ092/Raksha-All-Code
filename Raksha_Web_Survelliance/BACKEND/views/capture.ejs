@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Capture</title>
+</head>
+<body>
+  <h1>Camera Capture</h1>
+  <video id="preview" autoplay></video>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io('http://localhost:3000'); // Socket server connection
+    const preview = document.getElementById('preview');
+    const cameraId = 'camera1'; // Change this ID for each camera instance
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      .then((stream) => {
+        preview.srcObject = stream;
+
+        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs="vp9"' });
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            socket.emit('video-stream', { cameraId, data: event.data });
+          }
+        };
+
+        mediaRecorder.start(1000); // Capture in chunks of 100ms
+      })
+      .catch((err) => console.error('Error accessing media devices:', err));
+  </script>
+</body>
+</html>
